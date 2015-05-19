@@ -1,6 +1,6 @@
-import loggin
+import logging
 
-logging.BasicConfig(filename="snippets.log", level=logging.DEBUG)
+logging.basicConfig(filename="snippets.log", level=logging.DEBUG)
 
 def put(name, snippet):
     """
@@ -20,3 +20,13 @@ def get(name):
     """
     logging.error("FIXME: Unimplemented - get({!r})".format(name))
     return ""
+  
+def remove(name):
+    """
+    Deletes the snippet with the given name
+    
+    Returns the name
+    """
+    logging.error("FIXME: Unimplemented - remove({!r})".format(name))
+    return name
+    
