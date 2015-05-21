@@ -14,7 +14,12 @@ def put(name, snippet):
 
     Returns the name and the snippet
     """
-    logging.error("FIXME: Unimplemented - put({!r}, {!r})".format(name, snippet))
+    logging.info("Store snippet {!r}: {!r}".format(name, snippet))
+    cursor = connection.cursor()
+    command = "insert into snippets values (%s, %s)"
+    cursor.execute(command, (name, snippet))
+    connection.commit()
+    logging.debug("Snippet stored successfully.")
     return name, snippet
   
 def get(name):
@@ -24,8 +29,13 @@ def get(name):
 
     Returns the snippet.
     """
-    logging.error("FIXME: Unimplemented - get({!r})".format(name))
-    return ""
+    logging.info("Retrieve snippet {!r}".format(name))
+    cursor = connection.cursor()
+    command = "select * from snippets where keyword = %s"
+    cursor.execute(command, (name,))
+    (keyword, message) = cursor.fetchone()
+    logging.debug("Snippet retrieved successfully.")
+    return message
   
 def remove(name):
     """
