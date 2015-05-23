@@ -33,9 +33,14 @@ def get(name):
     cursor = connection.cursor()
     command = "select * from snippets where keyword = %s"
     cursor.execute(command, (name,))
-    (keyword, message) = cursor.fetchone()
+    row = cursor.fetchone()
+    connection.commit()
+    if not row:
+      logging.warn("No snippet was found with that name.")
+      print("No snippet was found with that name.")
+      return None
     logging.debug("Snippet retrieved successfully.")
-    return message
+    return row[1]
   
 def remove(name):
     """
@@ -74,7 +79,8 @@ def main():
       print("Stored {!r} as {!r}".format(snippet, name))
     elif command == "get":
       snippet = get(**arguments)
-      print("Retrieved snippet: {!r}".format(snippet))
+      if snippet:
+        print("Retrieved snippet: {!r}".format(snippet))
 
 if __name__ == "__main__":
     main()
