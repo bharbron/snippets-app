@@ -54,6 +54,32 @@ def remove(name):
     logging.error("FIXME: Unimplemented - remove({!r})".format(name))
     return name
   
+def catalog():
+    """
+    Fetches a list of all names from the snippets database
+    
+    Returns the names as a list
+    """
+    logging.info("Retrieving catalog of snippet names")
+    names = []
+    with connection, connection.cursor() as cursor:
+      command = "select keyword from snippets order by keyword asc"
+      cursor.execute(command)
+      rows = cursor.fetchall()
+      if rows:
+        for row in rows:
+          names.append(row[0])
+    return names
+  
+def search(phrase):
+    """
+    Searches for snippets that contain the given phrase somewhere in their message
+
+    Returns a list of snippet names and messages the contain the phrase
+    """
+    logging.error("FIXME: Unimplemented - search({!r})".format(phrase))
+    return name
+  
 def main():
     """Main function"""
     logging.info("Constructing parser")
@@ -72,6 +98,15 @@ def main():
     get_parser = subparsers.add_parser("get", help="Retrieve a snippet")
     get_parser.add_argument("name", help="The name of the snippet")
     
+    # Subparser for the catalog command
+    logging.debug("Constructing catalog subparser")
+    catalog_parser = subparsers.add_parser("catalog", help="List all snippet names in the database")
+    
+    # Subparse for the search command
+    logging.debug("Constructing search subparser")
+    search_parser = subparsers.add_parser("search", help="Searches for snippets with the given phrase somewhere in their message")
+    search_parser.add_argument("phrase", help="The phrase to search for")
+    
     arguments = parser.parse_args(sys.argv[1:])
     # Convert parsed arguments from Namespace to dictionary
     arguments = vars(arguments)
@@ -84,6 +119,12 @@ def main():
       snippet = get(**arguments)
       if snippet:
         print("Retrieved snippet: {!r}".format(snippet))
+    elif command == "catalog":
+      names = catalog()
+      print "The snippets database contains the following names:"
+      for name in names:
+        print name
+      
 
 if __name__ == "__main__":
     main()
