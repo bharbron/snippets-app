@@ -29,7 +29,7 @@ def put(name, snippet):
 def get(name):
     """Retrieve the snippet with a given name.
 
-    If there is no such snippet, inform the user no snippet of that name exists
+    If there is no such snippet, returns None
 
     Returns the snippet.
     """
@@ -40,7 +40,6 @@ def get(name):
       row = cursor.fetchone()
     if not row:
       logging.warn("No snippet was found with that name.")
-      print("No snippet was found with that name.")
       return None
     logging.debug("Snippet retrieved successfully.")
     return row[0]
@@ -59,6 +58,8 @@ def catalog():
     Fetches a list of all names from the snippets database
     
     Returns the names as a list
+    
+    Returns an empty list if there are no snippets in the database
     """
     logging.info("Retrieving catalog of snippet names")
     names = []
@@ -75,10 +76,20 @@ def search(phrase):
     """
     Searches for snippets that contain the given phrase somewhere in their message
 
-    Returns a list of snippet names and messages the contain the phrase
+    Returns a list of tuples (snippet name and message) that contain the phrase
+    
+    Returns None if no snippets were found with the phrase
     """
-    logging.error("FIXME: Unimplemented - search({!r})".format(phrase))
-    return name
+    logging.info("Searching for snippets with phrase {!r}".format(phrase))
+    with connection, connection.cursor() as cursor:
+      command = "select keyword, message from snippets where message like '%{}%'".format(phrase)
+      cursor.execute(command)
+      rows = cursor.fetchall()
+    if not rows:
+      logging.info("No snippets were found with that phrase.")
+      return None
+    logging.debug("Search found snippets")
+    return rows
   
 def main():
     """Main function"""
@@ -119,11 +130,23 @@ def main():
       snippet = get(**arguments)
       if snippet:
         print("Retrieved snippet: {!r}".format(snippet))
+      else:
+        print "No snippet was found with that name."
     elif command == "catalog":
       names = catalog()
       print "The snippets database contains the following names:"
       for name in names:
         print name
+    elif command == "search":
+      snippets = search(**arguments)
+      if snippets:
+        print "Found the following snippets:"
+        print 'Name\tMessage'
+        print '-----------------'
+        for snippet in snippets:
+          print '{}\t{}'.format(snippet[0], snippet[1])
+      else:
+        print "No snippets were found with that phrase."
       
 
 if __name__ == "__main__":
