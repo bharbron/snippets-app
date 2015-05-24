@@ -8,7 +8,7 @@ logging.debug("Connecting to PostgreSQL")
 connection = psycopg2.connect("dbname='snippets' user='action' host='localhost'")
 logging.debug("Database connection established.")
 
-def put(name, snippet):
+def put(name, snippet, hide, show):
     """
     Store a snippet with an associated name.
 
@@ -101,8 +101,12 @@ def main():
     # Subparser for the put command
     logging.debug("Constructing put subparser")
     put_parser = subparsers.add_parser("put", help="Store a snippet")
+    group = put_parser.add_mutually_exclusive_group()
+    group.add_argument("--hide", help="Sets the hidden flag on the snippet", action="store_true")
+    group.add_argument("--show", help="Removes the hidden flag from the snippet", action="store_true")
     put_parser.add_argument("name", help="The name of the snippet")
     put_parser.add_argument("snippet", help="The snippet text")
+
     
     # Subparser for the get command
     logging.debug("Constructing get subparser")
