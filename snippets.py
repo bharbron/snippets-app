@@ -71,7 +71,7 @@ def catalog():
     logging.info("Retrieving catalog of snippet names")
     names = []
     with connection, connection.cursor() as cursor:
-      command = "select keyword from snippets order by keyword asc"
+      command = "select keyword from snippets where not hidden order by keyword asc"
       cursor.execute(command)
       rows = cursor.fetchall()
       if rows:
@@ -89,7 +89,7 @@ def search(phrase):
     """
     logging.info("Searching for snippets with phrase {!r}".format(phrase))
     with connection, connection.cursor() as cursor:
-      command = "select keyword, message from snippets where message like '%{}%'".format(phrase)
+      command = "select keyword, message from snippets where message like '%{}%' and not hidden".format(phrase)
       cursor.execute(command)
       rows = cursor.fetchall()
     if not rows:
