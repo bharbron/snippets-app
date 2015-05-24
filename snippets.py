@@ -23,13 +23,11 @@ def put(name, snippet, hide, show):
         connection.rollback()
         if hide:
           command = "update snippets set message=%s, hidden=TRUE where keyword=%s"
-          cursor.execute(command, (snippet, name))
         elif show:
           command = "update snippets set message=%s, hidden=FALSE where keyword=%s"
-          cursor.execute(command, (snippet, name))
         else:
           command = "update snippets set message=%s where keyword=%s"
-          cursor.execute(command, (snippet, name))
+        cursor.execute(command, (snippet, name))
     logging.debug("Snippet stored successfully.")
     return name, snippet
   
