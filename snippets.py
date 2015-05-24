@@ -14,15 +14,22 @@ def put(name, snippet, hide, show):
 
     Returns the name and the snippet
     """
-    logging.info("Store snippet {!r}: {!r}".format(name, snippet))
+    logging.info("Store snippet {!r}: {!r}; hide = {!r}, show = {!r}".format(name, snippet, hide, show))
     with connection, connection.cursor() as cursor:
       try:
-        command = "insert into snippets values (%s, %s)"
-        cursor.execute(command, (name, snippet))
+        command = "insert into snippets values (%s, %s, %s)"
+        cursor.execute(command, (name, snippet, hide))
       except psycopg2.IntegrityError as e:
         connection.rollback()
-        command = "update snippets set message=%s where keyword=%s"
-        cursor.execute(command, (snippet, name))
+        if hide:
+          command = "update snippets set message=%s, hidden=TRUE where keyword=%s"
+          cursor.execute(command, (snippet, name))
+        elif show:
+          command = "update snippets set message=%s, hidden=FALSE where keyword=%s"
+          cursor.execute(command, (snippet, name))
+        else:
+          command = "update snippets set message=%s where keyword=%s"
+          cursor.execute(command, (snippet, name))
     logging.debug("Snippet stored successfully.")
     return name, snippet
   
